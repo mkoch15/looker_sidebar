@@ -8,6 +8,7 @@ looker.plugins.visualizations.add({
       section: "Buttons",
       default: 2
     },
+    // BUTTON 1 OPTIONS
     button1Label: {
       type: "string",
       label: "Button 1: Label",
@@ -32,6 +33,19 @@ looker.plugins.visualizations.add({
       section: "Button 1",
       default: "#FFFFFF"
     },
+    button1FilterName: {
+      type: "string",
+      label: "Button 1: Filter Name (URL Key)",
+      section: "Button 1",
+      default: "Department"
+    },
+    button1FilterValueField: {
+      type: "string",
+      label: "Button 1: Filter Value Field (dimension/measure name)",
+      section: "Button 1",
+      default: ""
+    },
+    // BUTTON 2 OPTIONS
     button2Label: {
       type: "string",
       label: "Button 2: Label",
@@ -56,6 +70,19 @@ looker.plugins.visualizations.add({
       section: "Button 2",
       default: "#FFFFFF"
     },
+    button2FilterName: {
+      type: "string",
+      label: "Button 2: Filter Name (URL Key)",
+      section: "Button 2",
+      default: ""
+    },
+    button2FilterValueField: {
+      type: "string",
+      label: "Button 2: Filter Value Field (dimension/measure name)",
+      section: "Button 2",
+      default: ""
+    },
+    // CONTAINER OPTIONS
     containerBg: {
       type: "string",
       label: "Container: Background Color",
@@ -114,6 +141,7 @@ looker.plugins.visualizations.add({
     const orientation = config.buttonOrientation || "vertical";
     const flexDirection = orientation === "horizontal" ? "row" : "column";
     const gap = orientation === "horizontal" ? "20px" : "16px";
+    const logoUrl = "https://media.ffycdn.net/eu/mobile-de-gmbh/7MzGm13UnVynqPwoWPiF.svg";
 
     // Clean up previous event listeners by clearing the element
     element.innerHTML = "";
@@ -130,6 +158,16 @@ looker.plugins.visualizations.add({
     container.style.width = "100%";
     container.style.boxSizing = "border-box";
 
+    // Logo
+    const logo = document.createElement("img");
+    logo.src = logoUrl;
+    logo.alt = "Logo";
+    logo.style.width = "120px";
+    logo.style.maxWidth = "100%";
+    logo.style.height = "auto";
+    logo.style.marginBottom = "24px";
+    container.appendChild(logo);
+
     // Button group
     const btnGroup = document.createElement("div");
     btnGroup.style.display = "flex";
@@ -139,12 +177,35 @@ looker.plugins.visualizations.add({
     btnGroup.style.alignItems = "center";
     btnGroup.style.width = "100%";
 
+    // Helper: Get value from data row by field name
+    function getFieldValue(fieldName) {
+      if (!fieldName) return '';
+      const row = data[0];
+      if (!row) return '';
+      // Try .value, fallback to raw value
+      return (row[fieldName] && (row[fieldName].value !== undefined ? row[fieldName].value : row[fieldName])) || '';
+    }
+
     // Add buttons
     for (let i = 1; i <= numButtons; i++) {
       const label = config[`button${i}Label`] || `Dashboard ${i}`;
       const dashId = config[`button${i}DashboardId`] || "2717";
       const bg = config[`button${i}Bg`] || "#FA3C00";
       const color = config[`button${i}Color`] || "#FFFFFF";
+      const filterName = config[`button${i}FilterName`] || "";
+      const filterValueField = config[`button${i}FilterValueField`] || "";
+
+      // Get the filter value from data
+      const filterValue = getFieldValue(filterValueField);
+
+      // Build URL with filter param if provided
+      let url = `https://moblooker.cloud.looker.com/dashboards/${dashId}`;
+      if (filterName && filterValue !== '') {
+        // URL encode both key and value, wrap value in double quotes for Looker
+        const paramKey = encodeURIComponent(filterName);
+        const paramValue = encodeURIComponent('"' + filterValue + '"');
+        url += `?${paramKey}=${paramValue}`;
+      }
 
       const btn = document.createElement("button");
       btn.type = "button";
@@ -180,16 +241,8 @@ looker.plugins.visualizations.add({
         btn.style.background = bg;
       });
 
-      // Click event for dynamic URL and console log
+      // Click event for URL and console log
       btn.addEventListener("click", function() {
-        // Get URL params at click time, preferring parent window if allowed
-        let params = "";
-        try {
-          params = window.parent.location.search || "";
-        } catch (e) {
-          params = window.location.search || "";
-        }
-        const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
         console.log("Dashboard link:", url);
         window.open(url, "_blank");
       });
