@@ -202,6 +202,7 @@ looker.plugins.visualizations.add({
         }
         const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
         console.log("Dashboard link:", url);
+        console.log(params);
         window.open(url, "_blank");
       });
 
