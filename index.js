@@ -202,14 +202,8 @@ looker.plugins.visualizations.add({
           params = window.location.search || "";
           console.log("locale:", params);
         }
-        const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
-        
-        console.log("Data:", data[0]);
-        const dim = data[0]['sales_360_revenue_mart_unpivot.sales_team'].filterable_value;
-         console.log("Data:", dim);
-        
-        console.log("Dashboard link:", url);
-        console.log("Params:", params);
+        const filter1 = data[0]['sales_360_revenue_mart_unpivot.sales_team'].filterable_value;
+        const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}"?Department="${dim}`;
         window.open(url, "_blank");
       });
 
