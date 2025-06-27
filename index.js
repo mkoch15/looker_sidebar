@@ -8,7 +8,6 @@ looker.plugins.visualizations.add({
       section: "Buttons",
       default: 2
     },
-    // Button 1 config
     button1Label: {
       type: "string",
       label: "Button 1: Label",
@@ -33,7 +32,6 @@ looker.plugins.visualizations.add({
       section: "Button 1",
       default: "#FFFFFF"
     },
-    // Button 2 config
     button2Label: {
       type: "string",
       label: "Button 2: Label",
@@ -58,7 +56,6 @@ looker.plugins.visualizations.add({
       section: "Button 2",
       default: "#FFFFFF"
     },
-    // Container styling
     containerBg: {
       type: "string",
       label: "Container: Background Color",
@@ -83,18 +80,17 @@ looker.plugins.visualizations.add({
       section: "Container",
       default: "0 4px 16px rgba(53,0,81,0.10)"
     },
-    // Button size and orientation
     buttonWidth: {
       type: "string",
-      label: "Button Width (e.g. 220px or 100%)",
+      label: "Button Width (e.g. 100%, 220px, auto)",
       section: "Button Style",
-      default: "220px"
+      default: "100%"
     },
     buttonHeight: {
       type: "string",
-      label: "Button Height (e.g. 50px)",
+      label: "Button Height (e.g. auto, 50px)",
       section: "Button Style",
-      default: "50px"
+      default: "auto"
     },
     buttonOrientation: {
       type: "string",
@@ -120,10 +116,10 @@ looker.plugins.visualizations.add({
     const gap = orientation === "horizontal" ? "20px" : "16px";
     const logoUrl = "https://media.ffycdn.net/eu/mobile-de-gmbh/7MzGm13UnVynqPwoWPiF.svg";
 
-    // Prepare container and logo
+    // Responsive container and logo
     let html = `
-      <div style="display:flex; flex-direction:column; align-items:center; background:${config.containerBg}; padding:${config.containerPadding}; border-radius:${config.containerBorderRadius}; box-shadow:${config.containerBoxShadow};">
-        <img src="${logoUrl}" alt="Logo" style="width:120px; margin-bottom:24px;" />
+      <div style="display:flex; flex-direction:column; align-items:center; background:${config.containerBg}; padding:${config.containerPadding}; border-radius:${config.containerBorderRadius}; box-shadow:${config.containerBoxShadow}; width:100%; box-sizing:border-box;">
+        <img src="${logoUrl}" alt="Logo" style="width:120px; max-width:100%; height:auto; margin-bottom:24px;" />
         <div id="dashboard-button-group" style="display:flex; flex-direction:${flexDirection}; gap:${gap}; justify-content:center; align-items:center; width:100%;">
     `;
 
@@ -133,15 +129,17 @@ looker.plugins.visualizations.add({
       const dashId = config[`button${i}DashboardId`] || "2717";
       const bg = config[`button${i}Bg`] || "#FA3C00";
       const color = config[`button${i}Color`] || "#FFFFFF";
-      // Use data-dash-id for dynamic link creation
       html += `
         <button
           type="button"
           class="looker-custom-dash-btn"
           data-dash-id="${dashId}"
           style="
-            width: ${config.buttonWidth || "220px"};
-            height: ${config.buttonHeight || "50px"};
+            width: ${config.buttonWidth || "100%"};
+            min-width: 120px;
+            max-width: 100%;
+            height: ${config.buttonHeight || "auto"};
+            min-height: 40px;
             background: ${bg};
             color: ${color};
             border: none;
@@ -154,6 +152,8 @@ looker.plugins.visualizations.add({
             transition: background 0.2s;
             margin: 0;
             cursor: pointer;
+            flex: 1 1 0%;
+            box-sizing: border-box;
           "
           onmouseover="this.style.background='#d22c00'"
           onmouseout="this.style.background='${bg}'"
@@ -166,12 +166,13 @@ looker.plugins.visualizations.add({
     html += `</div></div>`;
     element.innerHTML = html;
 
-    // Add event listeners for dynamic URL parameter handling
+    // Add event listeners for dynamic URL parameter handling and console logging
     Array.from(element.querySelectorAll(".looker-custom-dash-btn")).forEach(btn => {
       btn.onclick = function(e) {
         const dashId = btn.getAttribute("data-dash-id");
         const params = window.location.search || "";
         const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
+        console.log("Dashboard link:", url);
         window.open(url, "_blank");
       };
     });
