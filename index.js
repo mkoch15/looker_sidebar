@@ -203,6 +203,11 @@ looker.plugins.visualizations.add({
           console.log("locale:", params);
         }
         const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
+        
+        console.log("Data:", data[0]);
+        const dim = data[0]['sales_team'].value;
+         console.log("Data:", dim);
+        
         console.log("Dashboard link:", url);
         console.log("Params:", params);
         window.open(url, "_blank");
