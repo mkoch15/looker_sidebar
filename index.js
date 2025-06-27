@@ -205,7 +205,7 @@ looker.plugins.visualizations.add({
         const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
         
         console.log("Data:", data[0]);
-        const dim = data[0]['sales_team'].value;
+        const dim = data[0]['sales_360_revenue_mart_unpivot.sales_team'].filterable_value;
          console.log("Data:", dim);
         
         console.log("Dashboard link:", url);
