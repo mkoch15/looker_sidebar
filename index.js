@@ -116,66 +116,98 @@ looker.plugins.visualizations.add({
     const gap = orientation === "horizontal" ? "20px" : "16px";
     const logoUrl = "https://media.ffycdn.net/eu/mobile-de-gmbh/7MzGm13UnVynqPwoWPiF.svg";
 
-    // Responsive container and logo
-    let html = `
-      <div style="display:flex; flex-direction:column; align-items:center; background:${config.containerBg}; padding:${config.containerPadding}; border-radius:${config.containerBorderRadius}; box-shadow:${config.containerBoxShadow}; width:100%; box-sizing:border-box;">
-        <img src="${logoUrl}" alt="Logo" style="width:120px; max-width:100%; height:auto; margin-bottom:24px;" />
-        <div id="dashboard-button-group" style="display:flex; flex-direction:${flexDirection}; gap:${gap}; justify-content:center; align-items:center; width:100%;">
-    `;
+    // Clean up previous event listeners by clearing the element
+    element.innerHTML = "";
 
-    // Buttons
+    // Build container and logo
+    const container = document.createElement("div");
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.alignItems = "center";
+    container.style.background = config.containerBg;
+    container.style.padding = config.containerPadding;
+    container.style.borderRadius = config.containerBorderRadius;
+    container.style.boxShadow = config.containerBoxShadow;
+    container.style.width = "100%";
+    container.style.boxSizing = "border-box";
+
+    // Logo
+    const logo = document.createElement("img");
+    logo.src = logoUrl;
+    logo.alt = "Logo";
+    logo.style.width = "120px";
+    logo.style.maxWidth = "100%";
+    logo.style.height = "auto";
+    logo.style.marginBottom = "24px";
+    container.appendChild(logo);
+
+    // Button group
+    const btnGroup = document.createElement("div");
+    btnGroup.style.display = "flex";
+    btnGroup.style.flexDirection = flexDirection;
+    btnGroup.style.gap = gap;
+    btnGroup.style.justifyContent = "center";
+    btnGroup.style.alignItems = "center";
+    btnGroup.style.width = "100%";
+
+    // Add buttons
     for (let i = 1; i <= numButtons; i++) {
       const label = config[`button${i}Label`] || `Dashboard ${i}`;
       const dashId = config[`button${i}DashboardId`] || "2717";
       const bg = config[`button${i}Bg`] || "#FA3C00";
       const color = config[`button${i}Color`] || "#FFFFFF";
-      html += `
-        <button
-          type="button"
-          class="looker-custom-dash-btn"
-          data-dash-id="${dashId}"
-          style="
-            width: ${config.buttonWidth || "100%"};
-            min-width: 120px;
-            max-width: 100%;
-            height: ${config.buttonHeight || "auto"};
-            min-height: 40px;
-            background: ${bg};
-            color: ${color};
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
-            font-family: inherit;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-            transition: background 0.2s;
-            margin: 0;
-            cursor: pointer;
-            flex: 1 1 0%;
-            box-sizing: border-box;
-          "
-          onmouseover="this.style.background='#d22c00'"
-          onmouseout="this.style.background='${bg}'"
-        >
-          ${label}
-        </button>
-      `;
-    }
 
-    html += `</div></div>`;
-    element.innerHTML = html;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = label;
+      btn.setAttribute("data-dash-id", dashId);
 
-    // Add event listeners for dynamic URL parameter handling and console logging
-    Array.from(element.querySelectorAll(".looker-custom-dash-btn")).forEach(btn => {
-      btn.onclick = function(e) {
-        const dashId = btn.getAttribute("data-dash-id");
-        const params = window.location.search || "";
+      // Style the button
+      btn.style.width = config.buttonWidth || "100%";
+      btn.style.minWidth = "120px";
+      btn.style.maxWidth = "100%";
+      btn.style.height = config.buttonHeight || "auto";
+      btn.style.minHeight = "40px";
+      btn.style.background = bg;
+      btn.style.color = color;
+      btn.style.border = "none";
+      btn.style.borderRadius = "6px";
+      btn.style.fontSize = "1.1em";
+      btn.style.fontFamily = "inherit";
+      btn.style.fontWeight = "700";
+      btn.style.letterSpacing = "0.5px";
+      btn.style.boxShadow = "0 2px 8px rgba(0,0,0,0.10)";
+      btn.style.transition = "background 0.2s";
+      btn.style.margin = "0";
+      btn.style.cursor = "pointer";
+      btn.style.flex = "1 1 0%";
+      btn.style.boxSizing = "border-box";
+
+      // Mouse events for hover effect
+      btn.addEventListener("mouseenter", function() {
+        btn.style.background = "#d22c00";
+      });
+      btn.addEventListener("mouseleave", function() {
+        btn.style.background = bg;
+      });
+
+      // Click event for dynamic URL and console log
+      btn.addEventListener("click", function() {
+        // Get URL params at click time
+        let params = "";
+        try {
+          params = window.location.search || "";
+        } catch (e) {}
         const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
         console.log("Dashboard link:", url);
         window.open(url, "_blank");
-      };
-    });
+      });
+
+      btnGroup.appendChild(btn);
+    }
+
+    container.appendChild(btnGroup);
+    element.appendChild(container);
 
     done();
   }
