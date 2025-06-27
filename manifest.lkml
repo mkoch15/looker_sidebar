@@ -1,4 +1,4 @@
-project_name: "looker_sidebar"
+project_name: "mob_looker_sidebar"
 
 constant: VIS_LABEL {
   value: "Sidebar Navigation"
@@ -6,7 +6,7 @@ constant: VIS_LABEL {
 }
 
 constant: VIS_ID {
-  value: "looker_sidebar"
+  value: "mob_looker_sidebar"
   export:  override_optional
 }
 
