@@ -72,6 +72,12 @@ looker.plugins.visualizations.add({
       section: "Style",
       default: "#350051"
     },
+    containerHeight: {
+      type: "string",
+      label: "Container: Height (e.g. 100%, 400px, auto)",
+      section: "Style",
+      default: "100%"
+    },
     containerPadding: {
       type: "string",
       label: "Container: Padding",
@@ -134,6 +140,7 @@ looker.plugins.visualizations.add({
     container.style.flexDirection = "column";
     container.style.alignItems = "center";
     container.style.background = config.containerBg;
+    container.style.height = config.containerHeight || "100%";
     container.style.padding = config.containerPadding;
     container.style.borderRadius = config.containerBorderRadius;
     container.style.boxShadow = config.containerBoxShadow;
