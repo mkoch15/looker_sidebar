@@ -114,7 +114,6 @@ looker.plugins.visualizations.add({
     const orientation = config.buttonOrientation || "vertical";
     const flexDirection = orientation === "horizontal" ? "row" : "column";
     const gap = orientation === "horizontal" ? "20px" : "16px";
-    const logoUrl = "https://media.ffycdn.net/eu/mobile-de-gmbh/7MzGm13UnVynqPwoWPiF.svg";
 
     // Clean up previous event listeners by clearing the element
     element.innerHTML = "";
@@ -130,16 +129,6 @@ looker.plugins.visualizations.add({
     container.style.boxShadow = config.containerBoxShadow;
     container.style.width = "100%";
     container.style.boxSizing = "border-box";
-
-    // Logo
-    const logo = document.createElement("img");
-    logo.src = logoUrl;
-    logo.alt = "Logo";
-    logo.style.width = "120px";
-    logo.style.maxWidth = "100%";
-    logo.style.height = "auto";
-    logo.style.marginBottom = "24px";
-    container.appendChild(logo);
 
     // Button group
     const btnGroup = document.createElement("div");
