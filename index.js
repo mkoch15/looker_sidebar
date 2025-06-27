@@ -1,3 +1,50 @@
+const MAX_BUTTONS = 10; // Change as needed
+
+// Build button config options for up to MAX_BUTTONS
+function buildButtonOptions() {
+  const options = {};
+  for (let i = 1; i <= MAX_BUTTONS; i++) {
+    options[`button${i}Label`] = {
+      type: "string",
+      label: `Button ${i}: Label`,
+      section: "Config",
+      default: `Dashboard ${i}`
+    };
+    options[`button${i}DashboardId`] = {
+      type: "string",
+      label: `Button ${i}: Dashboard ID`,
+      section: "Config",
+      default: i === 1 ? "2717" : i === 2 ? "1234" : ""
+    };
+    options[`button${i}Bg`] = {
+      type: "string",
+      label: `Button ${i}: Background Color`,
+      section: "Config",
+      default: "#FA3C00"
+    };
+    options[`button${i}Color`] = {
+      type: "string",
+      label: `Button ${i}: Text Color`,
+      section: "Config",
+      default: "#FFFFFF"
+    };
+    options[`button${i}FilterName`] = {
+      type: "string",
+      label: `Button ${i}: Filter Name (URL Key)`,
+      section: "Config",
+      default: ""
+    };
+    options[`button${i}FilterValueField`] = {
+      type: "string",
+      label: `Button ${i}: Filter Value Field (data key)`,
+      section: "Config",
+      default: ""
+    };
+  }
+  return options;
+}
+
+// Main viz definition
 looker.plugins.visualizations.add({
   id: "dashboard_buttons",
   label: "Dashboard Buttons",
@@ -5,124 +52,58 @@ looker.plugins.visualizations.add({
     numButtons: {
       type: "number",
       label: "Number of Buttons",
-      section: "Buttons",
+      section: "Config",
       default: 2
     },
-    // BUTTON 1 OPTIONS
-    button1Label: {
+    buttonToConfigure: {
       type: "string",
-      label: "Button 1: Label",
-      section: "Button 1",
-      default: "Dashboard 1"
+      label: "Button to Configure (for reference)",
+      section: "Config",
+      display: "select",
+      values: Array.from({length: MAX_BUTTONS}, (_, i) => ({[`${i+1}`]: `${i+1}`})),
+      default: "1"
     },
-    button1DashboardId: {
-      type: "string",
-      label: "Button 1: Dashboard ID",
-      section: "Button 1",
-      default: "2717"
-    },
-    button1Bg: {
-      type: "string",
-      label: "Button 1: Background Color",
-      section: "Button 1",
-      default: "#FA3C00"
-    },
-    button1Color: {
-      type: "string",
-      label: "Button 1: Text Color",
-      section: "Button 1",
-      default: "#FFFFFF"
-    },
-    button1FilterName: {
-      type: "string",
-      label: "Button 1: Filter Name (URL Key)",
-      section: "Button 1",
-      default: "Department"
-    },
-    button1FilterValueField: {
-      type: "string",
-      label: "Button 1: Filter Value Field (dimension/measure name)",
-      section: "Button 1",
-      default: ""
-    },
-    // BUTTON 2 OPTIONS
-    button2Label: {
-      type: "string",
-      label: "Button 2: Label",
-      section: "Button 2",
-      default: "Dashboard 2"
-    },
-    button2DashboardId: {
-      type: "string",
-      label: "Button 2: Dashboard ID",
-      section: "Button 2",
-      default: "1234"
-    },
-    button2Bg: {
-      type: "string",
-      label: "Button 2: Background Color",
-      section: "Button 2",
-      default: "#FA3C00"
-    },
-    button2Color: {
-      type: "string",
-      label: "Button 2: Text Color",
-      section: "Button 2",
-      default: "#FFFFFF"
-    },
-    button2FilterName: {
-      type: "string",
-      label: "Button 2: Filter Name (URL Key)",
-      section: "Button 2",
-      default: ""
-    },
-    button2FilterValueField: {
-      type: "string",
-      label: "Button 2: Filter Value Field (dimension/measure name)",
-      section: "Button 2",
-      default: ""
-    },
-    // CONTAINER OPTIONS
+    ...buildButtonOptions(),
     containerBg: {
       type: "string",
       label: "Container: Background Color",
-      section: "Container",
+      section: "Config",
       default: "#350051"
     },
     containerPadding: {
       type: "string",
       label: "Container: Padding",
-      section: "Container",
+      section: "Config",
       default: "24px"
     },
     containerBorderRadius: {
       type: "string",
       label: "Container: Border Radius",
-      section: "Container",
+      section: "Config",
       default: "12px"
     },
     containerBoxShadow: {
       type: "string",
       label: "Container: Box Shadow",
-      section: "Container",
+      section: "Config",
       default: "0 4px 16px rgba(53,0,81,0.10)"
     },
     buttonWidth: {
       type: "string",
       label: "Button Width (e.g. 100%, 220px, auto)",
-      section: "Button Style",
+      section: "Config",
       default: "100%"
     },
     buttonHeight: {
       type: "string",
       label: "Button Height (e.g. auto, 50px)",
-      section: "Button Style",
+      section: "Config",
       default: "auto"
     },
     buttonOrientation: {
       type: "string",
       label: "Button Layout",
-      section: "Button Style",
+      section: "Config",
       display: "select",
       values: [
         {"Vertical (default)": "vertical"},
@@ -137,7 +118,7 @@ looker.plugins.visualizations.add({
   },
 
   updateAsync: function(data, element, config, queryResponse, details, done) {
-    const numButtons = Math.max(1, Math.min(10, config.numButtons || 2));
+    const numButtons = Math.max(1, Math.min(MAX_BUTTONS, config.numButtons || 2));
     const orientation = config.buttonOrientation || "vertical";
     const flexDirection = orientation === "horizontal" ? "row" : "column";
     const gap = orientation === "horizontal" ? "20px" : "16px";
@@ -182,26 +163,21 @@ looker.plugins.visualizations.add({
       if (!fieldName) return '';
       const row = data[0];
       if (!row) return '';
-      // Try .value, fallback to raw value
       return (row[fieldName] && (row[fieldName].value !== undefined ? row[fieldName].value : row[fieldName])) || '';
     }
 
     // Add buttons
     for (let i = 1; i <= numButtons; i++) {
       const label = config[`button${i}Label`] || `Dashboard ${i}`;
-      const dashId = config[`button${i}DashboardId`] || "2717";
+      const dashId = config[`button${i}DashboardId`] || "";
       const bg = config[`button${i}Bg`] || "#FA3C00";
       const color = config[`button${i}Color`] || "#FFFFFF";
       const filterName = config[`button${i}FilterName`] || "";
       const filterValueField = config[`button${i}FilterValueField`] || "";
-
-      // Get the filter value from data
       const filterValue = getFieldValue(filterValueField);
 
-      // Build URL with filter param if provided
       let url = `https://moblooker.cloud.looker.com/dashboards/${dashId}`;
       if (filterName && filterValue !== '') {
-        // URL encode both key and value, wrap value in double quotes for Looker
         const paramKey = encodeURIComponent(filterName);
         const paramValue = encodeURIComponent('"' + filterValue + '"');
         url += `?${paramKey}=${paramValue}`;
@@ -233,7 +209,6 @@ looker.plugins.visualizations.add({
       btn.style.flex = "1 1 0%";
       btn.style.boxSizing = "border-box";
 
-      // Mouse events for hover effect
       btn.addEventListener("mouseenter", function() {
         btn.style.background = "#d22c00";
       });
@@ -241,7 +216,6 @@ looker.plugins.visualizations.add({
         btn.style.background = bg;
       });
 
-      // Click event for URL and console log
       btn.addEventListener("click", function() {
         console.log("Dashboard link:", url);
         window.open(url, "_blank");
@@ -252,6 +226,11 @@ looker.plugins.visualizations.add({
 
     container.appendChild(btnGroup);
     element.appendChild(container);
+
+    // Log available fields for user reference
+    if (data && data[0]) {
+      console.log("Available field names for filter value:", Object.keys(data[0]));
+    }
 
     done();
   }
