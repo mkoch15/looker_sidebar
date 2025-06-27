@@ -203,7 +203,7 @@ looker.plugins.visualizations.add({
           console.log("locale:", params);
         }
         const filter1 = data[0]['sales_360_revenue_mart_unpivot.sales_team'].filterable_value;
-        const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}"?Department="${dim}`;
+        const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}"?Department="${filter1}`;
         window.open(url, "_blank");
       });
 
