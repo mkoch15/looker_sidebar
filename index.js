@@ -25,7 +25,7 @@ looker.plugins.visualizations.add({
       type: "string",
       label: "Button 1: Background Color",
       section: "Button 1",
-      default: "#FA3C00" // Orange-Red
+      default: "#FA3C00"
     },
     button1Color: {
       type: "string",
@@ -63,7 +63,7 @@ looker.plugins.visualizations.add({
       type: "string",
       label: "Container: Background Color",
       section: "Container",
-      default: "#350051" // Purple
+      default: "#350051"
     },
     containerPadding: {
       type: "string",
@@ -82,6 +82,30 @@ looker.plugins.visualizations.add({
       label: "Container: Box Shadow",
       section: "Container",
       default: "0 4px 16px rgba(53,0,81,0.10)"
+    },
+    // Button size and orientation
+    buttonWidth: {
+      type: "string",
+      label: "Button Width (e.g. 220px or 100%)",
+      section: "Button Style",
+      default: "220px"
+    },
+    buttonHeight: {
+      type: "string",
+      label: "Button Height (e.g. 50px)",
+      section: "Button Style",
+      default: "50px"
+    },
+    buttonOrientation: {
+      type: "string",
+      label: "Button Layout",
+      section: "Button Style",
+      display: "select",
+      values: [
+        {"Vertical (default)": "vertical"},
+        {"Horizontal": "horizontal"}
+      ],
+      default: "vertical"
     }
   },
 
@@ -91,47 +115,67 @@ looker.plugins.visualizations.add({
 
   updateAsync: function(data, element, config, queryResponse, details, done) {
     const numButtons = Math.max(1, Math.min(10, config.numButtons || 2));
-    // Logo section
+    const orientation = config.buttonOrientation || "vertical";
+    const flexDirection = orientation === "horizontal" ? "row" : "column";
+    const gap = orientation === "horizontal" ? "20px" : "16px";
     const logoUrl = "https://media.ffycdn.net/eu/mobile-de-gmbh/7MzGm13UnVynqPwoWPiF.svg";
+
+    // Prepare container and logo
     let html = `
       <div style="display:flex; flex-direction:column; align-items:center; background:${config.containerBg}; padding:${config.containerPadding}; border-radius:${config.containerBorderRadius}; box-shadow:${config.containerBoxShadow};">
         <img src="${logoUrl}" alt="Logo" style="width:120px; margin-bottom:24px;" />
-        <div style="display:flex; gap:20px; justify-content:center; align-items:center;">
+        <div id="dashboard-button-group" style="display:flex; flex-direction:${flexDirection}; gap:${gap}; justify-content:center; align-items:center; width:100%;">
     `;
 
-    // Get current URL params
-    const urlParams = window.location.search || "";
-
+    // Buttons
     for (let i = 1; i <= numButtons; i++) {
       const label = config[`button${i}Label`] || `Dashboard ${i}`;
       const dashId = config[`button${i}DashboardId`] || "2717";
       const bg = config[`button${i}Bg`] || "#FA3C00";
       const color = config[`button${i}Color`] || "#FFFFFF";
-      const link = `https://moblooker.cloud.looker.com/dashboards/${dashId}${urlParams}`;
-
+      // Use data-dash-id for dynamic link creation
       html += `
-        <a href="${link}" target="_blank" style="
-          display: inline-block;
-          padding: 14px 32px;
-          background: ${bg};
-          color: ${color};
-          border: none;
-          border-radius: 6px;
-          text-decoration: none;
-          font-size: 1.1em;
-          font-family: inherit;
-          font-weight: 700;
-          letter-spacing: 0.5px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-          transition: background 0.2s;
-        " onmouseover="this.style.background='#d22c00'" onmouseout="this.style.background='${bg}'">
+        <button
+          type="button"
+          class="looker-custom-dash-btn"
+          data-dash-id="${dashId}"
+          style="
+            width: ${config.buttonWidth || "220px"};
+            height: ${config.buttonHeight || "50px"};
+            background: ${bg};
+            color: ${color};
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-family: inherit;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            transition: background 0.2s;
+            margin: 0;
+            cursor: pointer;
+          "
+          onmouseover="this.style.background='#d22c00'"
+          onmouseout="this.style.background='${bg}'"
+        >
           ${label}
-        </a>
+        </button>
       `;
     }
 
     html += `</div></div>`;
     element.innerHTML = html;
+
+    // Add event listeners for dynamic URL parameter handling
+    Array.from(element.querySelectorAll(".looker-custom-dash-btn")).forEach(btn => {
+      btn.onclick = function(e) {
+        const dashId = btn.getAttribute("data-dash-id");
+        const params = window.location.search || "";
+        const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
+        window.open(url, "_blank");
+      };
+    });
+
     done();
   }
 });
