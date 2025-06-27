@@ -1,12 +1,12 @@
-project_name: "single-viz-lookr-mobile"
+project_name: "looker_sidebar"
 
 constant: VIS_LABEL {
-  value: "Single Viz Lookr Mobile Pro"
+  value: "Sidebar Navigation"
   export: override_optional
 }
 
 constant: VIS_ID {
-  value: "single_value_lookr_mobile_pro"
+  value: "looker_sidebar"
   export:  override_optional
 }
 
