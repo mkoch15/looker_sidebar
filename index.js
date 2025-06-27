@@ -1,6 +1,5 @@
 const MAX_BUTTONS = 10; // Change as needed
 
-// Build button config options for up to MAX_BUTTONS
 function buildButtonOptions() {
   const options = {};
   for (let i = 1; i <= MAX_BUTTONS; i++) {
@@ -16,18 +15,6 @@ function buildButtonOptions() {
       section: "Config",
       default: i === 1 ? "2717" : i === 2 ? "1234" : ""
     };
-    options[`button${i}Bg`] = {
-      type: "string",
-      label: `Button ${i}: Background Color`,
-      section: "Config",
-      default: "#FA3C00"
-    };
-    options[`button${i}Color`] = {
-      type: "string",
-      label: `Button ${i}: Text Color`,
-      section: "Config",
-      default: "#FFFFFF"
-    };
     options[`button${i}FilterName`] = {
       type: "string",
       label: `Button ${i}: Filter Name (URL Key)`,
@@ -40,15 +27,28 @@ function buildButtonOptions() {
       section: "Config",
       default: ""
     };
+    // Button styling in Style section
+    options[`button${i}Bg`] = {
+      type: "string",
+      label: `Button ${i}: Background Color`,
+      section: "Style",
+      default: "#FA3C00"
+    };
+    options[`button${i}Color`] = {
+      type: "string",
+      label: `Button ${i}: Text Color`,
+      section: "Style",
+      default: "#FFFFFF"
+    };
   }
   return options;
 }
 
-// Main viz definition
 looker.plugins.visualizations.add({
   id: "dashboard_buttons",
   label: "Dashboard Buttons",
   options: {
+    // CONFIG TAB (button logic)
     numButtons: {
       type: "number",
       label: "Number of Buttons",
@@ -64,46 +64,48 @@ looker.plugins.visualizations.add({
       default: "1"
     },
     ...buildButtonOptions(),
+
+    // STYLE TAB (container and button style)
     containerBg: {
       type: "string",
       label: "Container: Background Color",
-      section: "Config",
+      section: "Style",
       default: "#350051"
     },
     containerPadding: {
       type: "string",
       label: "Container: Padding",
-      section: "Config",
+      section: "Style",
       default: "24px"
     },
     containerBorderRadius: {
       type: "string",
       label: "Container: Border Radius",
-      section: "Config",
+      section: "Style",
       default: "12px"
     },
     containerBoxShadow: {
       type: "string",
       label: "Container: Box Shadow",
-      section: "Config",
+      section: "Style",
       default: "0 4px 16px rgba(53,0,81,0.10)"
     },
     buttonWidth: {
       type: "string",
       label: "Button Width (e.g. 100%, 220px, auto)",
-      section: "Config",
+      section: "Style",
       default: "100%"
     },
     buttonHeight: {
       type: "string",
       label: "Button Height (e.g. auto, 50px)",
-      section: "Config",
+      section: "Style",
       default: "auto"
     },
     buttonOrientation: {
       type: "string",
       label: "Button Layout",
-      section: "Config",
+      section: "Style",
       display: "select",
       values: [
         {"Vertical (default)": "vertical"},
@@ -124,7 +126,6 @@ looker.plugins.visualizations.add({
     const gap = orientation === "horizontal" ? "20px" : "16px";
     const logoUrl = "https://media.ffycdn.net/eu/mobile-de-gmbh/7MzGm13UnVynqPwoWPiF.svg";
 
-    // Clean up previous event listeners by clearing the element
     element.innerHTML = "";
 
     // Build container
