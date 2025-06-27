@@ -197,8 +197,10 @@ looker.plugins.visualizations.add({
         let params = "";
         try {
           params = window.parent.location.search || "";
+          console.log("parent:", params);
         } catch (e) {
           params = window.location.search || "";
+          console.log("locale:", params);
         }
         const url = `https://moblooker.cloud.looker.com/dashboards/${dashId}${params}`;
         console.log("Dashboard link:", url);
