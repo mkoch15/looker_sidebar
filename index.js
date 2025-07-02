@@ -1,4 +1,4 @@
-const MAX_BUTTONS = 10; // Change as needed
+const MAX_BUTTONS = 10; // Adjust as needed
 
 function buildButtonOptions() {
   const options = {};
@@ -15,15 +15,29 @@ function buildButtonOptions() {
       section: "Config",
       default: i === 1 ? "2717" : i === 2 ? "1234" : ""
     };
-    options[`button${i}FilterName`] = {
+    // Filter 1
+    options[`button${i}FilterName1`] = {
       type: "string",
-      label: `Button ${i}: Filter Name (URL Key)`,
+      label: `Button ${i}: Filter 1 Name (URL Key)`,
       section: "Config",
       default: ""
     };
-    options[`button${i}FilterValueField`] = {
+    options[`button${i}FilterValueField1`] = {
       type: "string",
-      label: `Button ${i}: Filter Value Field (data key)`,
+      label: `Button ${i}: Filter 1 Value Field (data key)`,
+      section: "Config",
+      default: ""
+    };
+    // Filter 2
+    options[`button${i}FilterName2`] = {
+      type: "string",
+      label: `Button ${i}: Filter 2 Name (URL Key)`,
+      section: "Config",
+      default: ""
+    };
+    options[`button${i}FilterValueField2`] = {
+      type: "string",
+      label: `Button ${i}: Filter 2 Value Field (data key)`,
       section: "Config",
       default: ""
     };
@@ -48,7 +62,7 @@ looker.plugins.visualizations.add({
   id: "dashboard_buttons",
   label: "Dashboard Buttons",
   options: {
-    // CONFIG TAB (button logic) -- Number of Buttons FIRST!
+    // CONFIG TAB (button logic)
     numButtons: {
       type: "number",
       label: "Number of Buttons",
@@ -180,15 +194,22 @@ looker.plugins.visualizations.add({
       const dashId = config[`button${i}DashboardId`] || "";
       const bg = config[`button${i}Bg`] || "#FA3C00";
       const color = config[`button${i}Color`] || "#FFFFFF";
-      const filterName = config[`button${i}FilterName`] || "";
-      const filterValueField = config[`button${i}FilterValueField`] || "";
-      const filterValue = getFieldValue(filterValueField);
+      let params = [];
+
+      for (let f = 1; f <= 2; f++) {
+        const filterName = config[`button${i}FilterName${f}`] || "";
+        const filterValueField = config[`button${i}FilterValueField${f}`] || "";
+        const filterValue = getFieldValue(filterValueField);
+        if (filterName && filterValue !== '') {
+          const paramKey = encodeURIComponent(filterName);
+          const paramValue = encodeURIComponent('"' + filterValue + '"');
+          params.push(`${paramKey}=${paramValue}`);
+        }
+      }
 
       let url = `https://moblooker.cloud.looker.com/dashboards/${dashId}`;
-      if (filterName && filterValue !== '') {
-        const paramKey = encodeURIComponent(filterName);
-        const paramValue = encodeURIComponent('"' + filterValue + '"');
-        url += `?${paramKey}=${paramValue}`;
+      if (params.length > 0) {
+        url += `?${params.join("&")}`;
       }
 
       const btn = document.createElement("button");
