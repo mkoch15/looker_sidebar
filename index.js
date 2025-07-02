@@ -48,7 +48,7 @@ looker.plugins.visualizations.add({
   id: "dashboard_buttons",
   label: "Dashboard Buttons",
   options: {
-    // CONFIG TAB (button logic)
+    // CONFIG TAB (button logic) -- Number of Buttons FIRST!
     numButtons: {
       type: "number",
       label: "Number of Buttons",
